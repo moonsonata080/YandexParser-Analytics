@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔍 Тест дедупликации по ID</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1000px;
+            margin: 20px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-section {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        .success { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
+        .warning { background: #fff3cd; color: #856404; }
+        .info { background: #d1ecf1; color: #0c5460; }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin: 5px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover { background: #0056b3; }
+        .log {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 4px;
+            font-family: monospace;
+            max-height: 400px;
+            overflow-y: auto;
+            font-size: 12px;
+        }
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .stat-card {
+            background: #e9ecef;
+            padding: 15px;
+            border-radius: 6px;
+            text-align: center;
+        }
+        .stat-number {
+            font-size: 24px;
+            font-weight: bold;
+            color: #007bff;
+        }
+        .test-data {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+            font-family: monospace;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔍 Тест дедупликации по ID - YandexParser Analytics</h1>
+    
+    <div class="test-section">
+        <h2>📊 Статус расширения</h2>
+        <div id="extensionStatus" class="status info">Проверяем статус...</div>
+        <button onclick="checkExtensionStatus()">🔄 Проверить статус</button>
+        <button onclick="clearData()">🗑️ Очистить данные</button>
+        <button onclick="clearLog()">📝 Очистить лог</button>
+    </div>
+    
+    <div class="test-section">
+        <h2>🧪 Тесты дедупликации</h2>
+        <button onclick="testUniqueCards()">✅ Тест уникальных карточек</button>
+        <button onclick="testDuplicateCards()">❌ Тест дубликатов</button>
+        <button onclick="testMixedCards()">🔀 Тест смешанных данных</button>
+        <button onclick="testCardsWithoutID()">⚠️ Тест карточек без ID</button>
+        <button onclick="testLargeDataset()">📈 Тест большого набора данных</button>
+    </div>
+
+    <div class="test-section">
+        <h2>📊 Статистика тестирования</h2>
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-number" id="totalSent">0</div>
+                <div>Отправлено карточек</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="totalUnique">0</div>
+                <div>Уникальных добавлено</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="totalDuplicates">0</div>
+                <div>Дубликатов отфильтровано</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="efficiency">0%</div>
+                <div>Эффективность</div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="test-section">
+        <h2>📋 Тестовые данные</h2>
+        <div id="testDataPreview" class="test-data">Нажмите на любой тест, чтобы увидеть данные</div>
+    </div>
+    
+    <div class="test-section">
+        <h2>📊 Лог тестирования</h2>
+        <div id="testLog" class="log">Лог тестирования пуст...</div>
+    </div>
+
+    <script>
+        let logElement;
+        let testStats = {
+            totalSent: 0,
+            totalUnique: 0,
+            totalDuplicates: 0
+        };
+        
+        // Инициализация
+        document.addEventListener('DOMContentLoaded', function() {
+            logElement = document.getElementById('testLog');
+            log('🚀 Страница тестирования дедупликации загружена');
+            checkExtensionStatus();
+        });
+        
+        // Функция логирования
+        function log(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = `[${timestamp}] ${message}`;
+            
+            if (logElement) {
+                logElement.innerHTML += logEntry + '<br>';
+                logElement.scrollTop = logElement.scrollHeight;
+            }
+            
+            console.log(logEntry);
+        }
+        
+        // Очистка лога
+        function clearLog() {
+            if (logElement) {
+                logElement.innerHTML = 'Лог тестирования очищен...<br>';
+            }
+        }
+        
+        // Обновление статистики
+        function updateStats() {
+            document.getElementById('totalSent').textContent = testStats.totalSent;
+            document.getElementById('totalUnique').textContent = testStats.totalUnique;
+            document.getElementById('totalDuplicates').textContent = testStats.totalDuplicates;
+            
+            const efficiency = testStats.totalSent > 0 
+                ? ((testStats.totalUnique / testStats.totalSent) * 100).toFixed(1)
+                : 0;
+            document.getElementById('efficiency').textContent = efficiency + '%';
+        }
+        
+        // Проверка статуса расширения
+        function checkExtensionStatus() {
+            log('🔍 Проверяем статус расширения...');
+            
+            try {
+                if (typeof chrome !== 'undefined' && chrome.runtime && chrome.runtime.id) {
+                    log(`✅ Расширение активно: ${chrome.runtime.id}`);
+                    
+                    chrome.runtime.sendMessage({action: 'getCollectedData'}, (response) => {
+                        if (chrome.runtime.lastError) {
+                            log(`❌ Ошибка связи: ${chrome.runtime.lastError.message}`, 'error');
+                            updateStatus('❌ Ошибка связи с расширением', 'error');
+                        } else if (response) {
+                            log(`✅ Данные получены: ${response.data?.length || 0} карточек`);
+                            updateStatus('✅ Расширение работает', 'success');
+                        }
+                    });
+                } else {
+                    log('❌ chrome.runtime недоступен', 'error');
+                    updateStatus('❌ Расширение не обнаружено', 'error');
+                }
+            } catch (error) {
+                log(`❌ Ошибка: ${error.message}`, 'error');
+                updateStatus(`❌ Ошибка: ${error.message}`, 'error');
+            }
+        }
+        
+        // Обновление статуса
+        function updateStatus(message, type) {
+            const statusElement = document.getElementById('extensionStatus');
+            if (statusElement) {
+                statusElement.textContent = message;
+                statusElement.className = `status ${type}`;
+            }
+        }
+        
+        // Очистка данных расширения
+        function clearData() {
+            log('🗑️ Очищаем данные расширения...');
+            
+            chrome.runtime.sendMessage({action: 'clearData'}, (response) => {
+                if (chrome.runtime.lastError) {
+                    log(`❌ Ошибка очистки: ${chrome.runtime.lastError.message}`, 'error');
+                } else {
+                    log('✅ Данные очищены');
+                    testStats = { totalSent: 0, totalUnique: 0, totalDuplicates: 0 };
+                    updateStats();
+                }
+            });
+        }
+        
+        // Отправка тестовых данных
+        function sendTestData(testCards, testName) {
+            log(`🧪 Запуск теста: ${testName}`);
+            log(`📤 Отправляем ${testCards.length} карточек...`);
+            
+            // Показываем тестовые данные
+            const preview = document.getElementById('testDataPreview');
+            preview.innerHTML = `<strong>${testName}:</strong><br>` + 
+                testCards.map(card => `ID: ${card.id || 'НЕТ'} - ${card.title}`).join('<br>');
+            
+            testStats.totalSent += testCards.length;
+            
+            chrome.runtime.sendMessage({
+                action: 'addClinicData',
+                data: testCards,
+                url: window.location.href,
+                timestamp: Date.now()
+            }, (response) => {
+                if (chrome.runtime.lastError) {
+                    log(`❌ Ошибка отправки: ${chrome.runtime.lastError.message}`, 'error');
+                } else {
+                    log(`✅ Ответ получен: ${JSON.stringify(response)}`);
+                    
+                    // Получаем обновленные данные для подсчета статистики
+                    setTimeout(() => {
+                        chrome.runtime.sendMessage({action: 'getCollectedData'}, (response) => {
+                            if (response && response.data) {
+                                const currentTotal = response.data.length;
+                                testStats.totalUnique = currentTotal;
+                                testStats.totalDuplicates = testStats.totalSent - testStats.totalUnique;
+                                updateStats();
+                                log(`📊 Обновлена статистика: ${testStats.totalUnique} уникальных из ${testStats.totalSent} отправленных`);
+                            }
+                        });
+                    }, 1000);
+                }
+            });
+        }
+        
+        // Тест уникальных карточек
+        function testUniqueCards() {
+            const testCards = [
+                { id: 'unique_001', title: 'Уникальная клиника 1', address: 'Адрес 1' },
+                { id: 'unique_002', title: 'Уникальная клиника 2', address: 'Адрес 2' },
+                { id: 'unique_003', title: 'Уникальная клиника 3', address: 'Адрес 3' },
+                { id: 'unique_004', title: 'Уникальная клиника 4', address: 'Адрес 4' },
+                { id: 'unique_005', title: 'Уникальная клиника 5', address: 'Адрес 5' }
+            ];
+            
+            sendTestData(testCards, 'Тест уникальных карточек');
+        }
+        
+        // Тест дубликатов
+        function testDuplicateCards() {
+            const testCards = [
+                { id: 'duplicate_001', title: 'Дубликат клиника 1', address: 'Адрес 1' },
+                { id: 'duplicate_001', title: 'Дубликат клиника 1 (копия)', address: 'Адрес 1' },
+                { id: 'duplicate_002', title: 'Дубликат клиника 2', address: 'Адрес 2' },
+                { id: 'duplicate_002', title: 'Дубликат клиника 2 (копия)', address: 'Адрес 2' },
+                { id: 'duplicate_001', title: 'Дубликат клиника 1 (еще копия)', address: 'Адрес 1' }
+            ];
+            
+            sendTestData(testCards, 'Тест дубликатов (должно остаться 2 уникальных)');
+        }
+        
+        // Тест смешанных данных
+        function testMixedCards() {
+            const testCards = [
+                { id: 'mixed_001', title: 'Смешанная клиника 1', address: 'Адрес 1' },
+                { id: 'mixed_002', title: 'Смешанная клиника 2', address: 'Адрес 2' },
+                { id: 'mixed_001', title: 'Смешанная клиника 1 (дубликат)', address: 'Адрес 1' },
+                { id: 'mixed_003', title: 'Смешанная клиника 3', address: 'Адрес 3' },
+                { id: 'mixed_002', title: 'Смешанная клиника 2 (дубликат)', address: 'Адрес 2' },
+                { id: 'mixed_004', title: 'Смешанная клиника 4', address: 'Адрес 4' }
+            ];
+            
+            sendTestData(testCards, 'Тест смешанных данных (должно остаться 4 уникальных)');
+        }
+        
+        // Тест карточек без ID
+        function testCardsWithoutID() {
+            const testCards = [
+                { title: 'Клиника без ID 1', address: 'Адрес 1' },
+                { id: 'with_id_001', title: 'Клиника с ID 1', address: 'Адрес 2' },
+                { title: 'Клиника без ID 2', address: 'Адрес 3' },
+                { id: 'with_id_002', title: 'Клиника с ID 2', address: 'Адрес 4' },
+                { title: 'Клиника без ID 3', address: 'Адрес 5' }
+            ];
+            
+            sendTestData(testCards, 'Тест карточек без ID (все должны остаться)');
+        }
+        
+        // Тест большого набора данных
+        function testLargeDataset() {
+            const testCards = [];
+            
+            // Создаем 50 уникальных карточек
+            for (let i = 1; i <= 50; i++) {
+                testCards.push({
+                    id: `large_${i.toString().padStart(3, '0')}`,
+                    title: `Большой тест клиника ${i}`,
+                    address: `Адрес ${i}`
+                });
+            }
+            
+            // Добавляем 25 дубликатов
+            for (let i = 1; i <= 25; i++) {
+                testCards.push({
+                    id: `large_${i.toString().padStart(3, '0')}`,
+                    title: `Большой тест клиника ${i} (дубликат)`,
+                    address: `Адрес ${i}`
+                });
+            }
+            
+            // Перемешиваем массив
+            for (let i = testCards.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [testCards[i], testCards[j]] = [testCards[j], testCards[i]];
+            }
+            
+            sendTestData(testCards, 'Тест большого набора (75 карточек, должно остаться 50 уникальных)');
+        }
+        
+        // Слушаем ошибки
+        window.addEventListener('error', function(event) {
+            log(`❌ JavaScript ошибка: ${event.message}`, 'error');
+        });
+        
+        // Инициализируем статистику
+        updateStats();
+    </script>
+</body>
+</html>
