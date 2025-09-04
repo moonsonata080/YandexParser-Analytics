@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тест YandexParser Analytics</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-card {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .test-button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .test-button:hover {
+            background: #0056b3;
+        }
+        .status {
+            background: #e9ecef;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        .log {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 20px 0;
+            max-height: 300px;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🧪 Тестовая страница YandexParser Analytics</h1>
+    
+    <div class="test-card">
+        <h3>📊 Тестовые данные</h3>
+        <p>Эта страница содержит тестовые данные для проверки работы расширения.</p>
+        
+        <div id="testData">
+            <!-- Тестовые данные будут добавлены здесь -->
+        </div>
+        
+        <button class="test-button" onclick="addTestData()">➕ Добавить тестовые данные</button>
+        <button class="test-button" onclick="clearTestData()">🗑️ Очистить данные</button>
+    </div>
+    
+    <div class="test-card">
+        <h3>🔍 Статус расширения</h3>
+        <div id="extensionStatus" class="status">
+            Проверяем статус расширения...
+        </div>
+        <button class="test-button" onclick="checkExtensionStatus()">🔄 Проверить статус</button>
+    </div>
+    
+    <div class="test-card">
+        <h3>📝 Лог событий</h3>
+        <div id="eventLog" class="log">
+            Лог событий будет отображаться здесь...
+        </div>
+        <button class="test-button" onclick="clearLog()">🗑️ Очистить лог</button>
+    </div>
+    
+    <div class="test-card">
+        <h3>🚀 Тестирование функций</h3>
+        <button class="test-button" onclick="testDataInterception()">🔍 Тест перехвата данных</button>
+        <button class="test-button" onclick="testMessagePassing()">📨 Тест передачи сообщений</button>
+        <button class="test-button" onclick="simulateClinicData()">🏥 Симуляция данных клиник</button>
+    </div>
+
+    <script>
+        // Глобальные переменные
+        let testDataCount = 0;
+        let eventLog = [];
+        
+        // Инициализация
+        document.addEventListener('DOMContentLoaded', function() {
+            checkExtensionStatus();
+            addTestData();
+            setupEventListeners();
+        });
+        
+        // Настройка слушателей событий
+        function setupEventListeners() {
+            // Слушаем сообщения от расширения
+            window.addEventListener('message', function(event) {
+                if (event.source !== window) return;
+                
+                logEvent('Получено сообщение от расширения', event.data);
+                
+                if (event.data.type === 'CLINIC_DATA_INTERCEPTED') {
+                    logEvent('✅ Данные клиник перехвачены!', {
+                        count: event.data.clinics.length,
+                        url: event.data.url
+                    });
+                }
+            });
+            
+            // Слушаем сообщения от content script
+            if (window.chrome && window.chrome.runtime) {
+                chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+                    logEvent('Получено сообщение от content script', message);
+                    sendResponse({ status: 'received' });
+                });
+            }
+        }
+        
+        // Добавление тестовых данных
+        function addTestData() {
+            const testData = [
+                {
+                    type: 'business',
+                    id: `test-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+                    title: 'Тестовая клиника №1',
+                    address: 'ул. Тестовая, 123',
+                    coordinates: [37.617, 55.757],
+                    ratingData: {
+                        ratingValue: 4.5,
+                        reviewCount: 150,
+                        ratingCount: 200
+                    },
+                    categories: ['Медицина', 'Клиника'],
+                    phones: ['+7 (123) 456-78-90'],
+                    workingHours: 'Пн-Пт 9:00-18:00'
+                },
+                {
+                    type: 'business',
+                    id: `test-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+                    title: 'Тестовая клиника №2',
+                    address: 'пр. Тестовый, 456',
+                    coordinates: [37.618, 55.758],
+                    ratingData: {
+                        ratingValue: 4.8,
+                        reviewCount: 89,
+                        ratingCount: 120
+                    },
+                    categories: ['Медицина', 'Больница'],
+                    phones: ['+7 (123) 456-78-91'],
+                    workingHours: 'Круглосуточно'
+                }
+            ];
+            
+            const container = document.getElementById('testData');
+            container.innerHTML = '';
+            
+            testData.forEach((item, index) => {
+                const card = document.createElement('div');
+                card.style.cssText = `
+                    background: #f8f9fa;
+                    border: 1px solid #dee2e6;
+                    border-radius: 5px;
+                    padding: 15px;
+                    margin: 10px 0;
+                `;
+                
+                card.innerHTML = `
+                    <h4>${item.title}</h4>
+                    <p><strong>Адрес:</strong> ${item.address}</p>
+                    <p><strong>Рейтинг:</strong> ${item.ratingData.ratingValue}/5 (${item.ratingData.reviewCount} отзывов)</p>
+                    <p><strong>Категории:</strong> ${item.categories.join(', ')}</p>
+                    <p><strong>Телефон:</strong> ${item.phones.join(', ')}</p>
+                    <p><strong>Часы работы:</strong> ${item.workingHours}</p>
+                `;
+                
+                container.appendChild(card);
+            });
+            
+            testDataCount = testData.length;
+            logEvent(`Добавлено ${testData.length} тестовых карточек`);
+        }
+        
+        // Очистка тестовых данных
+        function clearTestData() {
+            document.getElementById('testData').innerHTML = '';
+            testDataCount = 0;
+            logEvent('Тестовые данные очищены');
+        }
+        
+        // Проверка статуса расширения
+        function checkExtensionStatus() {
+            const statusDiv = document.getElementById('extensionStatus');
+            
+            if (typeof chrome !== 'undefined' && chrome.runtime && chrome.runtime.id) {
+                statusDiv.innerHTML = `
+                    <strong>✅ Расширение активно</strong><br>
+                    ID: ${chrome.runtime.id}<br>
+                    Версия: ${chrome.runtime.getManifest().version}<br>
+                    Тестовых карточек: ${testDataCount}
+                `;
+                statusDiv.style.background = '#d4edda';
+                statusDiv.style.border = '1px solid #c3e6cb';
+            } else {
+                statusDiv.innerHTML = `
+                    <strong>❌ Расширение не обнаружено</strong><br>
+                    Убедитесь, что расширение установлено и активировано
+                `;
+                statusDiv.style.background = '#f8d7da';
+                statusDiv.style.border = '1px solid #f5c6cb';
+            }
+        }
+        
+        // Тест перехвата данных
+        function testDataInterception() {
+            logEvent('🔍 Тестирование перехвата данных...');
+            
+            // Создаем тестовый fetch запрос
+            const testUrl = 'https://test-api.example.com/clinics';
+            const testData = {
+                items: [
+                    {
+                        type: 'business',
+                        title: 'Тестовая клиника API',
+                        address: 'ул. API Тестовая, 789',
+                        rating: 4.7,
+                        reviewCount: 67
+                    }
+                ]
+            };
+            
+            // Симулируем fetch запрос
+            if (window.fetch) {
+                // Создаем mock response
+                const mockResponse = new Response(JSON.stringify(testData));
+                
+                // Вызываем обработчик fetch
+                window.dispatchEvent(new CustomEvent('fetch-test', {
+                    detail: { url: testUrl, data: testData }
+                }));
+                
+                logEvent('📡 Тестовый fetch запрос отправлен', { url: testUrl, data: testData });
+            } else {
+                logEvent('❌ Fetch API не поддерживается');
+            }
+        }
+        
+        // Тест передачи сообщений
+        function testMessagePassing() {
+            logEvent('📨 Тестирование передачи сообщений...');
+            
+            // Отправляем тестовое сообщение
+            window.postMessage({
+                type: 'TEST_MESSAGE',
+                data: 'Тестовое сообщение от страницы',
+                timestamp: Date.now()
+            }, '*');
+            
+            logEvent('📤 Тестовое сообщение отправлено');
+        }
+        
+        // Симуляция данных клиник
+        function simulateClinicData() {
+            logEvent('🏥 Симуляция данных клиник...');
+            
+            // Создаем тестовые данные в формате, который ожидает расширение
+            const clinicData = {
+                type: 'CLINIC_DATA_INTERCEPTED',
+                clinics: [
+                    {
+                        type: 'business',
+                        id: `sim-${Date.now()}`,
+                        title: 'Симулированная клиника',
+                        address: 'ул. Симуляционная, 999',
+                        coordinates: [37.619, 55.759],
+                        ratingData: {
+                            ratingValue: 4.9,
+                            reviewCount: 234,
+                            ratingCount: 300
+                        }
+                    }
+                ],
+                url: window.location.href,
+                timestamp: Date.now()
+            };
+            
+            // Отправляем данные как будто они были перехвачены
+            window.postMessage(clinicData, '*');
+            
+            logEvent('✅ Данные клиник симулированы', clinicData);
+        }
+        
+        // Логирование событий
+        function logEvent(message, data = null) {
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = `[${timestamp}] ${message}${data ? ': ' + JSON.stringify(data, null, 2) : ''}`;
+            
+            eventLog.push(logEntry);
+            
+            const logDiv = document.getElementById('eventLog');
+            logDiv.innerHTML = eventLog.map(entry => `<div>${entry}</div>`).join('');
+            logDiv.scrollTop = logDiv.scrollHeight;
+            
+            console.log('[Test Debug]', message, data);
+        }
+        
+        // Очистка лога
+        function clearLog() {
+            eventLog = [];
+            document.getElementById('eventLog').innerHTML = 'Лог очищен';
+        }
+        
+        // Автоматическое обновление статуса
+        setInterval(checkExtensionStatus, 5000);
+        
+        // Логирование загрузки страницы
+        logEvent('🚀 Тестовая страница загружена');
+        logEvent('📋 Готов к тестированию расширения');
+    </script>
+</body>
+</html>

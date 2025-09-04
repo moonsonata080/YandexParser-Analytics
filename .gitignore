@@ -1,0 +1,66 @@
+# Операционные системы
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Редакторы
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Логи
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Временные файлы
+*.tmp
+*.temp
+.cache/
+
+# Собранные данные (примеры можно оставить)
+business_data_*.json
+business_data_*.js
+collected_data_*.json
+
+# Персональные настройки
+config.local.js
+.env.local
+
+# Архивы
+*.zip
+*.rar
+*.7z
+*.tar.gz
+
+# Резервные копии
+*.bak
+*.backup
+*.old
+
+# Node.js (если используется для разработки)
+node_modules/
+package-lock.json
+yarn.lock
+
+# Тестовые файлы пользователей
+user_test_*
+my_test_*
+
+# Приватные ключи и сертификаты
+*.pem
+*.key
+*.crt
+*.p12
+
+# Локальные базы данных
+*.db
+*.sqlite
+*.sqlite3

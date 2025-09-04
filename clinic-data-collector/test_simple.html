@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔍 Простой тест расширения</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-section {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        .success { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
+        .warning { background: #fff3cd; color: #856404; }
+        .info { background: #d1ecf1; color: #0c5460; }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin: 5px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover { background: #0056b3; }
+        .log {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 4px;
+            font-family: monospace;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔍 Простой тест расширения YandexParser Analytics</h1>
+    
+    <div class="test-section">
+        <h2>📋 Статус расширения</h2>
+        <div id="extensionStatus" class="status info">Проверяем статус...</div>
+        <button onclick="checkExtensionStatus()">🔄 Проверить статус</button>
+        <button onclick="clearLog()">🗑️ Очистить лог</button>
+    </div>
+    
+    <div class="test-section">
+        <h2>🧪 Тесты функциональности</h2>
+        <button onclick="testMessagePassing()">📨 Тест передачи сообщений</button>
+        <button onclick="testDataCollection()">🏥 Тест сбора данных</button>
+        <button onclick="testAutoScroll()">🔄 Тест автопрокрутки</button>
+    </div>
+    
+    <div class="test-section">
+        <h2>📊 Лог событий</h2>
+        <div id="eventLog" class="log">Лог пуст...</div>
+    </div>
+    
+    <div class="test-section">
+        <h2>📝 Инструкции</h2>
+        <ol>
+            <li><strong>Убедитесь, что расширение включено</strong> в chrome://extensions/</li>
+            <li><strong>Перезагрузите расширение</strong> если есть ошибки</li>
+            <li><strong>Нажмите "Проверить статус"</strong> для диагностики</li>
+            <li><strong>Проверьте консоль браузера</strong> (F12 → Console) на наличие ошибок</li>
+        </ol>
+    </div>
+
+    <script>
+        let logElement;
+        
+        // Инициализация
+        document.addEventListener('DOMContentLoaded', function() {
+            logElement = document.getElementById('eventLog');
+            log('🚀 Страница загружена');
+            checkExtensionStatus();
+        });
+        
+        // Функция логирования
+        function log(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = `[${timestamp}] ${message}`;
+            
+            if (logElement) {
+                logElement.innerHTML += logEntry + '<br>';
+                logElement.scrollTop = logElement.scrollHeight;
+            }
+            
+            console.log(logEntry);
+        }
+        
+        // Очистка лога
+        function clearLog() {
+            if (logElement) {
+                logElement.innerHTML = 'Лог очищен...<br>';
+            }
+        }
+        
+        // Проверка статуса расширения
+        function checkExtensionStatus() {
+            log('🔍 Проверяем статус расширения...');
+            
+            try {
+                // Проверяем доступность chrome.runtime
+                if (typeof chrome !== 'undefined' && chrome.runtime) {
+                    log('✅ chrome.runtime доступен');
+                    
+                    // Проверяем ID расширения
+                    if (chrome.runtime.id) {
+                        log(`✅ ID расширения: ${chrome.runtime.id}`);
+                        
+                        // Тестируем отправку сообщения
+                        chrome.runtime.sendMessage({action: 'getCollectedData'}, (response) => {
+                            if (chrome.runtime.lastError) {
+                                log(`❌ Ошибка связи: ${chrome.runtime.lastError.message}`, 'error');
+                                updateStatus('❌ Ошибка связи с расширением', 'error');
+                            } else if (response) {
+                                log(`✅ Получен ответ: ${JSON.stringify(response)}`);
+                                updateStatus('✅ Расширение работает', 'success');
+                            } else {
+                                log('⚠️ Нет ответа от расширения', 'warning');
+                                updateStatus('⚠️ Нет ответа от расширения', 'warning');
+                            }
+                        });
+                    } else {
+                        log('❌ ID расширения не найден', 'error');
+                        updateStatus('❌ ID расширения не найден', 'error');
+                    }
+                } else {
+                    log('❌ chrome.runtime недоступен', 'error');
+                    updateStatus('❌ chrome.runtime недоступен', 'error');
+                }
+            } catch (error) {
+                log(`❌ Ошибка при проверке: ${error.message}`, 'error');
+                updateStatus(`❌ Ошибка: ${error.message}`, 'error');
+            }
+        }
+        
+        // Обновление статуса
+        function updateStatus(message, type) {
+            const statusElement = document.getElementById('extensionStatus');
+            if (statusElement) {
+                statusElement.textContent = message;
+                statusElement.className = `status ${type}`;
+            }
+        }
+        
+        // Тест передачи сообщений
+        function testMessagePassing() {
+            log('📨 Тестируем передачу сообщений...');
+            
+            try {
+                chrome.runtime.sendMessage({action: 'getCollectionLimit'}, (response) => {
+                    if (chrome.runtime.lastError) {
+                        log(`❌ Ошибка: ${chrome.runtime.lastError.message}`, 'error');
+                    } else {
+                        log(`✅ Получен лимит: ${JSON.stringify(response)}`);
+                    }
+                });
+            } catch (error) {
+                log(`❌ Ошибка: ${error.message}`, 'error');
+            }
+        }
+        
+        // Тест сбора данных
+        function testDataCollection() {
+            log('🏥 Тестируем сбор данных...');
+            
+            try {
+                // Симулируем данные клиник
+                const testData = [{
+                    id: 'test-001',
+                    title: 'Тестовая клиника',
+                    address: 'Тестовый адрес',
+                    coordinates: [55.7558, 37.6176],
+                    rating: 4.5,
+                    reviewCount: 100,
+                    dataQuality: 0.8
+                }];
+                
+                chrome.runtime.sendMessage({
+                    action: 'addClinicData',
+                    data: testData,
+                    url: window.location.href,
+                    timestamp: Date.now()
+                }, (response) => {
+                    if (chrome.runtime.lastError) {
+                        log(`❌ Ошибка: ${chrome.runtime.lastError.message}`, 'error');
+                    } else {
+                        log(`✅ Данные отправлены: ${JSON.stringify(response)}`);
+                    }
+                });
+            } catch (error) {
+                log(`❌ Ошибка: ${error.message}`, 'error');
+            }
+        }
+        
+        // Тест автопрокрутки
+        function testAutoScroll() {
+            log('🔄 Тестируем автопрокрутку...');
+            
+            try {
+                chrome.runtime.sendMessage({action: 'startAutoScroll'}, (response) => {
+                    if (chrome.runtime.lastError) {
+                        log(`❌ Ошибка: ${chrome.runtime.lastError.message}`, 'error');
+                    } else {
+                        log(`✅ Автопрокрутка запущена: ${JSON.stringify(response)}`);
+                        
+                        // Останавливаем через 2 секунды
+                        setTimeout(() => {
+                            chrome.runtime.sendMessage({action: 'stopAutoScroll'}, (response) => {
+                                log(`✅ Автопрокрутка остановлена: ${JSON.stringify(response)}`);
+                            });
+                        }, 2000);
+                    }
+                });
+            } catch (error) {
+                log(`❌ Ошибка: ${error.message}`, 'error');
+            }
+        }
+        
+        // Слушаем сообщения от расширения
+        window.addEventListener('message', function(event) {
+            if (event.source !== window) return;
+            
+            log(`📨 Получено сообщение: ${event.data.type || 'неизвестный тип'}`);
+        });
+        
+        // Слушаем ошибки
+        window.addEventListener('error', function(event) {
+            log(`❌ JavaScript ошибка: ${event.message}`, 'error');
+        });
+        
+        // Слушаем необработанные промисы
+        window.addEventListener('unhandledrejection', function(event) {
+            log(`❌ Необработанный промис: ${event.reason}`, 'error');
+        });
+    </script>
+</body>
+</html>
