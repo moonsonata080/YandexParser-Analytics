@@ -2,8 +2,8 @@
 
 **Профессиональное расширение для Chrome/Chromium для сбора и анализа данных организаций с Яндекс.Карт**
 
-[![Chrome Extension](https://img.shields.io/badge/Chrome-Extension-4285f4?style=for-the-badge&logo=googlechrome)](https://github.com/yourusername/yandex-parser-analytics)
-[![JavaScript](https://img.shields.io/badge/JavaScript-ES6+-f7df1e?style=for-the-badge&logo=javascript)](https://github.com/yourusername/yandex-parser-analytics)
+[![Chrome Extension](https://img.shields.io/badge/Chrome-Extension-4285f4?style=for-the-badge&logo=googlechrome)](https://github.com/moonsonata080/YandexParser-Analytics)
+[![JavaScript](https://img.shields.io/badge/JavaScript-ES6+-f7df1e?style=for-the-badge&logo=javascript)](https://github.com/moonsonata080/YandexParser-Analytics)
 [![MIT License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)](LICENSE)
 
 ## 🎯 **Описание**
@@ -36,7 +36,7 @@ YandexParser Analytics — это мощное расширение для бр�
 
 1. **Скачайте проект**:
    ```bash
-   git clone https://github.com/yourusername/yandex-parser-analytics.git
+   git clone https://github.com/moonsonata080/YandexParser-Analytics.git
    cd yandex-parser-analytics
    ```
 
@@ -55,7 +55,7 @@ YandexParser Analytics — это мощное расширение для бр�
 
 ### Метод 2: Из релиза
 
-1. Скачайте последний релиз из [Releases](https://github.com/yourusername/yandex-parser-analytics/releases)
+1. Скачайте последний релиз из [Releases](https://github.com/moonsonata080/YandexParser-Analytics/releases)
 2. Распакуйте архив
 3. Следуйте шагам 2-6 из метода 1
 
@@ -256,8 +256,8 @@ if (clinic.dataQuality >= 0.2) { // 20%+
 
 ### Как помочь
 
-1. **🐛 Сообщите об ошибке** через [Issues](https://github.com/yourusername/yandex-parser-analytics/issues)
-2. **💡 Предложите улучшение** через [Discussions](https://github.com/yourusername/yandex-parser-analytics/discussions)
+1. **🐛 Сообщите об ошибке** через [Issues](https://github.com/moonsonata080/YandexParser-Analytics/issues)
+2. **💡 Предложите улучшение** через [Discussions](https://github.com/moonsonata080/YandexParser-Analytics/discussions)
 3. **🔧 Отправьте Pull Request** с исправлениями или новыми функциями
 
 ### Процесс разработки
@@ -287,7 +287,7 @@ if (clinic.dataQuality >= 0.2) { // 20%+
 
 ## 👥 **Авторы**
 
-- **Основной разработчик** - [@yourusername](https://github.com/yourusername)
+- **Основной разработчик** - [@moonsonata080](https://github.com/moonsonata080)
 
 ## 🙏 **Благодарности**
 
@@ -299,12 +299,12 @@ if (clinic.dataQuality >= 0.2) { // 20%+
 
 Если у вас есть вопросы или нужна помощь:
 
-- 📧 **Email**: your.email@example.com
+- 📧 **Email**: jukin56@gmail.com
 - 💬 **Telegram**: [@yourusername](https://t.me/yourusername)
-- 🐛 **Issues**: [GitHub Issues](https://github.com/yourusername/yandex-parser-analytics/issues)
+- 🐛 **Issues**: [GitHub Issues](https://github.com/moonsonata080/YandexParser-Analytics/issues)
 
 ---
 
 **⭐ Если проект оказался полезным, поставьте звездочку!**
 
-[![GitHub stars](https://img.shields.io/github/stars/yourusername/yandex-parser-analytics?style=social)](https://github.com/yourusername/yandex-parser-analytics/stargazers)
+[![GitHub stars](https://img.shields.io/github/stars/moonsonata080/YandexParser-Analytics?style=social)](https://github.com/moonsonata080/YandexParser-Analytics/stargazers)
