@@ -299,14 +299,7 @@ if (clinic.dataQuality >= 0.2) { // 20%+
 - Команде Яндекс.Карт за отличный API
 - Сообществу разработчиков Chrome Extensions
 - Всем контрибьюторам проекта
-
-## 📞 **Поддержка**
-
-Если у вас есть вопросы или нужна помощь:
-
-- 📧 **Email**: jukin56@gmail.com
-- 💬 **Telegram**: [@yourusername](https://t.me/yourusername)
-- 🐛 **Issues**: [GitHub Issues](https://github.com/moonsonata080/YandexParser-Analytics/issues)
+- Ромчику
 
 ---
 
